@@ -1,0 +1,3 @@
+flask
+bcrypt  # For password hashing
+pymongo  # For MongoDB integration
