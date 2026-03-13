@@ -134,7 +134,7 @@ if __name__ == '__main__':
         with open('.env', 'w') as f:
             f.write('SECRET_KEY=secret-key-here\n')
             f.write('JWT_SECRET=jwt-secret-here\n')
-            f.write('MONGODB_URI=mongodb+srv://pankaj230:check12@cluster0.lnrqzpn.mongodb.net/ \n')
+            f.write('MONGODB_URI=mongodb+srv://user:<pass>@cluster0.lnrqzpn.mongodb.net/ \n')
 
     debug_mode = os.getenv('FLASK_ENV', 'development') == 'development'
     app.run(

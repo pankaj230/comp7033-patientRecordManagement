@@ -189,7 +189,7 @@ class SQLiteDB:
 
 class MongoDB:
     def __init__(self, uri: str = None, db_name: str = 'patient_records'):
-        self.uri = uri or os.getenv('MONGODB_URI', 'mongodb+srv://pankaj230:check12@cluster0.lnrqzpn.mongodb.net/')
+        self.uri = uri or os.getenv('MONGODB_URI', 'mongodb+srv://user:<pass>@cluster0.lnrqzpn.mongodb.net/')
         self.db_name = db_name
         self.client = None
         self.db = None
@@ -234,19 +234,19 @@ class MongoDB:
 
                 # Heart Disease/Diabetes Dataset Attributes
                 'age': data.get('age', 0),
-                'sex': data.get('sex', ''),  # Male/Female
-                'blood_pressure': data.get('blood_pressure', 0),  # Resting BP
-                'cholesterol': data.get('cholesterol', 0),  # Serum cholesterol level
-                'fasting_blood_sugar': data.get('fasting_blood_sugar', False),  # >120 mg/dl: True/False
-                'resting_ecg': data.get('resting_ecg', 'Normal'),  # Normal/Abnormal
-                'exercise_induced_angina': data.get('exercise_induced_angina', False),  # Yes/No
+                'sex': data.get('sex', ''),
+                'blood_pressure': data.get('blood_pressure', 0),
+                'cholesterol': data.get('cholesterol', 0),
+                'fasting_blood_sugar': data.get('fasting_blood_sugar', False),
+                'resting_ecg': data.get('resting_ecg', 'Normal'),
+                'exercise_induced_angina': data.get('exercise_induced_angina', False),
 
                 # Additional clinical data
                 'max_heart_rate': data.get('max_heart_rate', 0),
-                'oldpeak': data.get('oldpeak', 0.0),  # ST depression
-                'slope': data.get('slope', ''),  # Peak exercise ST segment
-                'ca': data.get('ca', 0),  # Number of major vessels colored by fluoroscopy
-                'thal': data.get('thal', ''),  # Thalassemia
+                'oldpeak': data.get('oldpeak', 0.0),
+                'slope': data.get('slope', ''),
+                'ca': data.get('ca', 0),
+                'thal': data.get('thal', ''),
 
                 'diagnosis': data.get('diagnosis', ''),
                 'treatment_plan': data.get('treatment_plan', ''),
