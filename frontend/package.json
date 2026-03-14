@@ -1,0 +1,24 @@
+{
+  "name": "patient-record-management-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Secure Patient Record Management System",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && npm run copy-dist",
+    "copy-dist": "mkdir -p ../static/js && cp -r dist/* ../static/js/ && echo 'Frontend built successfully! Files copied to static/js/'",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist/* ../static/js/*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "healthcare",
+    "patient-records",
+    "typescript",
+    "frontend"
+  ],
+  "author": "Patient Record Management Team",
+  "license": "MIT"
+}
