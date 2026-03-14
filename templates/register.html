@@ -4,40 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patient Record System - Register</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
 </head>
 <body>
     <div class="register-container">
         <h2>Create Account</h2>
         <div id="alertContainer"></div>
+        <div id="spinner" style="display:none;text-align:center;margin-bottom:16px;">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="16" cy="16" r="14" stroke="#39803c" stroke-width="4" stroke-linecap="round" stroke-dasharray="44" stroke-dashoffset="22">
+                    <animateTransform attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="0.8s" repeatCount="indefinite" />
+                </circle>
+            </svg>
+        </div>
         <form id="registerForm" method="post">
             <div class="form-group">
                 <label for="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                <input type="text" id="firstName" name="firstName" required>
                 <div class="error-message"></div>
             </div>
 
             <div class="form-group">
                 <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                <input type="text" id="lastName" name="lastName" required>
                 <div class="error-message"></div>
             </div>
 
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="you@example.com" required>
+                <input type="email" id="email" name="email" required>
                 <div class="error-message"></div>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                <input type="password" id="password" name="password" required>
                 <div class="error-message"></div>
             </div>
 
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
                 <div class="error-message"></div>
             </div>
 
@@ -60,6 +68,41 @@
         </div>
     </div>
 
-    <script type="module" src="{{ url_for('static', filename='js/pages/register.js') }}"></script>
+    <script type="module">
+import { showAlert } from '/static/js/utils/index.js';
+
+const form = document.getElementById('registerForm');
+const spinner = document.getElementById('spinner');
+const alertContainer = document.getElementById('alertContainer');
+
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    spinner.style.display = 'block';
+    alertContainer.innerHTML = '';
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => { data[key] = value; });
+    try {
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        spinner.style.display = 'none';
+        if (result.success) {
+            showAlert('Registration successful!', 'success', alertContainer);
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1200);
+        } else {
+            showAlert(result.message || 'Registration failed.', 'error', alertContainer);
+        }
+    } catch (err) {
+        spinner.style.display = 'none';
+        showAlert('Registration failed. Please try again.', 'error', alertContainer);
+    }
+});
+</script>
 </body>
 </html>

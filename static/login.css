@@ -1,0 +1,21 @@
+.login-container {
+    background: white;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: 40px auto;
+}
+.login-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+.login-link a {
+    color: #2E6B31;
+    text-decoration: none;
+}
+.login-link a:hover {
+    text-decoration: underline;
+}

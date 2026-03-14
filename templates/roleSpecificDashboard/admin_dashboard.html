@@ -4,24 +4,27 @@
     <h2>Admin Dashboard</h2>
     <div class="dashboard-cards">
         <div class="card">
+            <span class="card-icon">👤</span>
             <h3>User Management</h3>
             <p>Manage users, clinicians, and patients. Add, update, or deactivate accounts.</p>
             <div class="card-btn-container">
-                <a href="/user_management" class="btn btn-primary">Go to User Management</a>
+                <button onclick="window.location.href='/user_management'" class="card-btn">Go to User Management</button>
             </div>
         </div>
         <div class="card">
+            <span class="card-icon">📜</span>
             <h3>Audit Logs</h3>
             <p>View system audit logs for accountability and compliance.</p>
             <div class="card-btn-container">
-                <a href="/audit_logs" class="btn btn-primary">Go to Audit Logs</a>
+                <button onclick="window.location.href='/audit_logs'" class="card-btn">Go to Audit Logs</button>
             </div>
         </div>
         <div class="card">
+            <span class="card-icon">⚙️</span>
             <h3>System Settings</h3>
             <p>Configure application settings, security, and compliance options.</p>
             <div class="card-btn-container">
-                <a href="/system_settings" class="btn btn-primary">Go to System Settings</a>
+                <button onclick="window.location.href='/system_settings'" class="card-btn">Go to System Settings</button>
             </div>
         </div>
     </div>
@@ -30,7 +33,88 @@
     </div>
 {% endblock %}
 {% block styles %}
-<link rel="stylesheet" href="/static/style.css">
+    <style>
+    .dashboard-cards {
+        display: flex;
+        gap: 40px;
+        margin-top: 40px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .card {
+        background: linear-gradient(135deg, #e8f5e9 0%, #f5f5f5 100%);
+        border: 2px solid #39803c;
+        border-radius: 18px;
+        box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+        padding: 36px 28px;
+        width: 340px;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        transition: box-shadow 0.2s, transform 0.2s;
+        position: relative;
+        overflow: hidden;
+    }
+    .card:hover {
+        box-shadow: 0 12px 32px rgba(44, 62, 80, 0.18);
+        transform: scale(1.03);
+    }
+    .card h3 {
+        margin-top: 0;
+        color: #39803c;
+        font-size: 1.4em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .card .card-icon {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        font-size: 2.2em;
+        color: #39803c;
+        opacity: 0.18;
+        pointer-events: none;
+    }
+    .card p {
+        color: #555;
+        margin: 18px 0 0 0;
+        font-size: 1.05em;
+        text-align: center;
+    }
+    .card-btn-container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        margin-top: 22px;
+    }
+    .card-btn {
+        display: inline-block;
+        padding: 12px 28px;
+        background: #39803c;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 1.08em;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(44, 62, 80, 0.12);
+        text-decoration: none;
+    }
+    .card-btn:hover {
+        background: #45a049;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(44, 62, 80, 0.18);
+    }
+    .dashboard-footer {
+        margin-top: 40px;
+        text-align: center;
+    }
+    </style>
 {% endblock %}
 {% block scripts %}
 <script type="module">
