@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block title %}Manage Admins{% endblock %}
+{% block content %}
+<h2>Manage Admins</h2>
+<div class="dashboard-cards">
+    <div class="card" style="width:100%">
+        <h3>View Admins</h3>
+        <p>See all admin users in the system.</p>
+        <table id="adminsTable" class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="card">
+        <h3>Add Admin</h3>
+        <p>Add a new admin user to the system.</p>
+        <a href="#" class="btn btn-primary">Add Admin</a>
+    </div>
+    <div class="card">
+        <h3>Deactivate Admin</h3>
+        <p>Deactivate or update admin accounts.</p>
+        <a href="#" class="btn btn-primary">Deactivate Admin</a>
+    </div>
+</div>
+<div class="dashboard-footer">
+    <button id="backButton" class="btn btn-secondary">Back to User Management</button>
+</div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+async function loadAdmins() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/admin/admins', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (data.success && data.admins) {
+            const tbody = document.querySelector('#adminsTable tbody');
+            tbody.innerHTML = '';
+            data.admins.forEach(admin => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${admin.id}</td>
+                    <td>${admin.email}</td>
+                    <td>${admin.first_name} ${admin.last_name}</td>
+                    <td>${admin.is_active ? 'Active' : 'Inactive'}</td>
+                    <td>${admin.created_at}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading admins:', error);
+    }
+}
+loadAdmins();
+document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = '/user_management';
+});
+</script>
+{% endblock %}

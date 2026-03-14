@@ -2,9 +2,38 @@
 {% block title %}Clinician Dashboard{% endblock %}
 {% block content %}
     <h2>Clinician Dashboard</h2>
-    <p>Manage patient records, issue prescriptions, and view appointments.</p>
-    <ul>
-        <li><a href="/patient_records">Patient Records</a></li>
-        <li><a href="/prescriptions">Prescriptions</a></li>
-    </ul>
+    <div class="dashboard-cards">
+        <div class="card">
+            <h3>Patient Records</h3>
+            <p>View and manage your patients' medical records.</p>
+            <div class="card-btn-container">
+                <a href="/patient_records" class="btn btn-primary">Go to Patient Records</a>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Prescriptions</h3>
+            <p>Issue and review prescriptions for your patients.</p>
+            <div class="card-btn-container">
+                <a href="/prescriptions" class="btn btn-primary">Go to Prescriptions</a>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-footer">
+        <button id="logoutButton" class="btn btn-secondary">Logout</button>
+    </div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+    import { authManager } from '/static/js/auth/manager.js';
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if (confirm('Are you sure you want to logout?')) {
+            authManager.logout();
+            authManager.redirectToHome();
+        }
+    });
+</script>
 {% endblock %}

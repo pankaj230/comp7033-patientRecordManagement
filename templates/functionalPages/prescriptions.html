@@ -1,7 +1,93 @@
 {% extends "layout.html" %}
-{% block title %}Prescriptions{% endblock %}
+{% block title %}Prescription Management{% endblock %}
 {% block content %}
-    <h2>Prescriptions</h2>
-    <p>View or issue prescriptions for patients.</p>
+<div class="dashboard-container">
+    <h2>Prescription Management</h2>
+    <p>Issue new prescriptions for patients.</p>
 
+    <form id="prescriptionForm">
+        <div class="form-group">
+            <label for="patientSelect">Select Patient:</label>
+            <select id="patientSelect" name="patient_id" required class="form-control">
+                <option value="">Choose a patient...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="medication">Medication:</label>
+            <input type="text" id="medication" name="medication" required>
+        </div>
+        <div class="form-group">
+            <label for="dosage">Dosage:</label>
+            <input type="text" id="dosage" name="dosage" required placeholder="e.g., 100mg twice daily">
+        </div>
+        <div class="form-group">
+            <label for="duration">Duration:</label>
+            <input type="text" id="duration" name="duration" required placeholder="e.g., 30 days">
+        </div>
+        <button type="submit" class="btn btn-primary">Issue Prescription</button>
+    </form>
+
+    <div id="message" style="margin-top: 20px;"></div>
+</div>
+
+<div class="dashboard-footer">
+    <button id="backButton" class="btn btn-secondary">Back to Clinician Dashboard</button>
+</div>
+
+<script type="module">
+    import { authManager } from '/static/js/auth/manager.js';
+    import { apiClient } from '/static/js/api/client.js';
+
+    // Load patients list
+    async function loadPatients() {
+        try {
+            const response = await apiClient.getAllUsers();
+            if (response.success) {
+                const patients = response.users.filter(user => user.role === 'patient');
+                const select = document.getElementById('patientSelect');
+                patients.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = `${patient.first_name} ${patient.last_name} (${patient.email})`;
+                    select.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading patients:', error);
+        }
+    }
+
+    // Handle form submission
+    document.getElementById('prescriptionForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const prescriptionData = {
+            patient_id: parseInt(formData.get('patient_id')),
+            medication: formData.get('medication'),
+            dosage: formData.get('dosage'),
+            duration: formData.get('duration')
+        };
+
+        try {
+            const response = await apiClient.createPrescription(prescriptionData);
+            if (response.success) {
+                document.getElementById('message').innerHTML = '<p style="color: green;">Prescription issued successfully!</p>';
+                this.reset();
+            } else {
+                document.getElementById('message').innerHTML = `<p style="color: red;">Error: ${response.message}</p>`;
+            }
+        } catch (error) {
+            console.error('Error issuing prescription:', error);
+            document.getElementById('message').innerHTML = '<p style="color: red;">Error issuing prescription.</p>';
+        }
+    });
+
+    // Load patients on page load
+    loadPatients();
+
+    document.getElementById('backButton').addEventListener('click', function() {
+        window.location.href = '/clinician-dashboard';
+    });
+</script>
 {% endblock %}

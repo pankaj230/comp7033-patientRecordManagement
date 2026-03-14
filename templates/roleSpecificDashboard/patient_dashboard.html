@@ -36,6 +36,12 @@
         <h2>Book Appointment</h2>
         <form id="appointmentForm">
             <div class="form-group">
+                <label for="clinicianSelect">Select Clinician:</label>
+                <select id="clinicianSelect" name="clinician_id" required class="form-control">
+                    <option value="">Choose a clinician...</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="appointmentDate">Appointment Date</label>
                 <input type="datetime-local" id="appointmentDate" name="appointmentDate" required>
             </div>
@@ -103,12 +109,6 @@
         min-height: 100px;
     }
 
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
-
     .data-table th,
     .data-table td {
         padding: 10px;
@@ -119,21 +119,6 @@
     .data-table th {
         background-color: #f5f5f5;
         font-weight: bold;
-    }
-
-    .no-data {
-        color: #666;
-        font-style: italic;
-        padding: 20px;
-        text-align: center;
-    }
-
-    .error {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 15px;
-        border-radius: 4px;
-        border: 1px solid #f5c6cb;
     }
 
     .btn {
@@ -212,7 +197,8 @@
     }
 
     .form-group input,
-    .form-group textarea {
+    .form-group textarea,
+    .form-group select {
         width: 100%;
         padding: 10px;
         border: 1px solid #ccc;

@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Audit Logs{% endblock %}
+{% block content %}
+<h2>Audit Logs</h2>
+<div class="dashboard-cards">
+    <div class="card">
+        <h3>View Logs</h3>
+        <p>Review system activity and user actions for compliance.</p>
+        <a href="/api/admin/audit-logs" class="btn btn-primary">View Logs</a>
+    </div>
+    <div class="card">
+        <h3>Export Logs</h3>
+        <p>Export audit logs for external review or backup.</p>
+        <a href="/api/admin/audit-logs?export=true" class="btn btn-primary">Export Logs</a>
+    </div>
+</div>
+<div class="dashboard-footer">
+    <button id="backButton" class="btn btn-secondary">Back to Admin Dashboard</button>
+</div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = '/admin-dashboard';
+});
+</script>
+{% endblock %}
