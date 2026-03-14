@@ -1,0 +1,71 @@
+.record-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 18px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #39803c;
+    font-weight: 600;
+}
+.form-control,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    width: 100%;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+.dashboard-container {
+    padding: 32px 0;
+    max-width: 600px;
+    margin: 0 auto;
+}
+body {
+    padding: 0 12px;
+}
+.record-card h4 {
+    margin-top: 0;
+    color: #2E6B31;
+}
+.record-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+.record-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid #2E6B31;
+}
+.record-item strong {
+    color: #333;
+}
+.record-item .category {
+    font-size: 0.85em;
+    color: #666;
+    margin-left: 5px;
+}
+.record-item.full-width {
+    grid-column: 1 / -1;
+}

@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    margin: 0;
+    padding: 0;
+}
+.header {
+    background: #2E6B31;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: lighter;
+}
+nav {
+    background: #2E6B31;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+nav h2 {
+    margin: 0;
+    color: white;
+}
+nav p {
+    margin: 5px 0 0;
+    font-size: 0.9em;
+}
+footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.8em;
+    color: #555;
+}
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+label {
+    display: block;
+    margin: 15px 0 5px;
+    color: #555;
+}
+input,
+select,
+button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button {
+    background: #2E6B31;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+button:hover {
+    background: #45a049;
+}
+@media (max-width: 500px) {
+    .login-container,
+    .register-container {
+        margin: 20px 10px;
+        padding: 20px;
+    }
+}
+.footer-text {
+    color: #39803c;
+    text-align: center;
+    margin-top: 40px;
+    opacity: 0.95;
+    font-size: 1em;
+}
+.main-content {
+    min-height: 70vh;
+    padding: 24px 0;
+}

@@ -43,7 +43,7 @@ This project implements a **secure web-based patient record management system** 
 ### Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/pankaj230/comp7033-lab-assessment.git
+   git clone https://github.com/pankaj230/comp7033-patientRecordManagement.git
    cd secure-patient-record-system
    ```
 2. Install dependencies:
