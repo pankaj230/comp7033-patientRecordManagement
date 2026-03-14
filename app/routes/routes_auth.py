@@ -14,9 +14,17 @@ def register_page():
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
-        data = request.get_json() or request.form
+        if request.is_json:
+            data = request.get_json()
+        else:
+            data = request.form.to_dict()
 
-        # Extract and sanitize input
+        if not isinstance(data, dict):
+            return jsonify({
+                'success': False,
+                'message': 'Invalid request data'
+            }), 400
+
         email = sanitize_input(data.get('email', '').strip())
         password = data.get('password', '').strip()
         first_name = sanitize_input(data.get('first_name', '').strip())
@@ -41,10 +49,10 @@ def register():
                 'message': 'Password must be at least 8 characters long'
             }), 400
 
-        if role not in ['patient']:
+        if role not in ['patient', 'clinician', 'admin']:
             return jsonify({
                 'success': False,
-                'message': 'Invalid role. Only patient registration is allowed.'
+                'message': 'Invalid role.'
             }), 400
 
         result = register_user(email, password, first_name, last_name, role)
@@ -53,14 +61,12 @@ def register():
             return jsonify({
                 'success': True,
                 'message': result['message'],
-                'redirect': url_for('auth.login_page')
-            }), 201
+            }), 200
         else:
             return jsonify({
                 'success': False,
                 'message': result['message']
             }), 400
-
     except Exception as e:
         return jsonify({
             'success': False,
@@ -77,6 +83,12 @@ def login_page():
 def login():
     try:
         data = request.get_json() or request.form
+
+        if not isinstance(data, dict):
+            return jsonify({
+                'success': False,
+                'message': 'Invalid request data'
+            }), 400
 
         email = sanitize_input(data.get('email', '').strip())
         password = data.get('password', '').strip()
@@ -102,9 +114,8 @@ def login():
             return jsonify({
                 'success': True,
                 'message': result['message'],
-                'access_token': result['access_token'],
                 'user': result['user'],
-                'redirect': _get_dashboard_redirect(result['user']['role'])
+                'access_token': result['access_token']
             }), 200
         else:
             return jsonify({
@@ -124,7 +135,7 @@ def login():
 def logout():
     try:
         identity = get_jwt_identity()
-        user_id = identity.get('id')
+        user_id = int(identity)
 
         log_audit('LOGOUT', 'user_authentication', str(user_id))
 
@@ -148,10 +159,24 @@ def verify_token():
     """Verify JWT token validity"""
     try:
         identity = get_jwt_identity()
+        user_id = int(identity)
+        user = sqlite_db.get_user_by_id(user_id)
+        if not user or not user['is_active']:
+            return jsonify({
+                'success': False,
+                'valid': False,
+                'message': 'User not found or inactive'
+            }), 401
         return jsonify({
             'success': True,
             'valid': True,
-            'user': identity
+            'user': {
+                'id': user['id'],
+                'email': user['email'],
+                'first_name': user['first_name'],
+                'last_name': user['last_name'],
+                'role': user['role']
+            }
         }), 200
     except Exception as e:
         return jsonify({

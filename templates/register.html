@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
 </head>
 <body>
+    <div class="header-section">
+        <h1>Register for Patient Record System</h1>
+        <p>Create your secure account to access healthcare services and records.</p>
+    </div>
     <div class="register-container">
         <h2>Create Account</h2>
         <div id="alertContainer"></div>
@@ -18,16 +22,16 @@
                 </circle>
             </svg>
         </div>
-        <form id="registerForm" method="post">
+        <form id="registerForm" method="post" action="/auth/register">
             <div class="form-group">
-                <label for="firstName">First Name</label>
-                <input type="text" id="firstName" name="firstName" required>
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" required>
                 <div class="error-message"></div>
             </div>
 
             <div class="form-group">
-                <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="lastName" required>
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" required>
                 <div class="error-message"></div>
             </div>
 
@@ -44,8 +48,8 @@
             </div>
 
             <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
                 <div class="error-message"></div>
             </div>
 
@@ -60,14 +64,13 @@
                 <div class="error-message"></div>
             </div>
 
-            <button type="submit" id="submitButton">Register</button>
+            <button type="submit" id="submitButton" class="enhanced-btn">Register</button>
         </form>
-
         <div class="login-link">
             <p>Already have an account? <a id="loginLink" href="/login">Login here</a></p>
         </div>
     </div>
-
+    <!-- Removed inline style block, styles are now in register.css -->
     <script type="module">
 import { showAlert } from '/static/js/utils/index.js';
 
@@ -80,10 +83,17 @@ form.addEventListener('submit', async function(e) {
     spinner.style.display = 'block';
     alertContainer.innerHTML = '';
     const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => { data[key] = value; });
+    // Use snake_case keys for backend compatibility
+    const data = {
+        first_name: formData.get('first_name'),
+        last_name: formData.get('last_name'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        confirm_password: formData.get('confirm_password'),
+        role: formData.get('role')
+    };
     try {
-        const response = await fetch('/register', {
+        const response = await fetch('/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -91,12 +101,12 @@ form.addEventListener('submit', async function(e) {
         const result = await response.json();
         spinner.style.display = 'none';
         if (result.success) {
-            showAlert('Registration successful!', 'success', alertContainer);
-            setTimeout(() => {
-                window.location.href = '/login';
-            }, 1200);
+            showAlert('🎉 ' + (result.message || 'Registration successful! You can now log in.'), 'success', alertContainer);
+            // Keep the alert visible and do not redirect immediately
+            // Optionally, scroll to top for visibility
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            showAlert(result.message || 'Registration failed.', 'error', alertContainer);
+            showAlert('❌ ' + (result.message || 'Registration failed. Please check your details and try again.'), 'error', alertContainer);
         }
     } catch (err) {
         spinner.style.display = 'none';
