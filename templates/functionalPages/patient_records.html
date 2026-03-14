@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+{% block title %}Patient Records Management{% endblock %}
+{% block content %}
+<div class="dashboard-container">
+    <h2>Patient Records Management</h2>
+    <p>Select a patient to view or update their medical records.</p>
+
+    <div class="form-group">
+        <label for="patientSelect">Select Patient:</label>
+        <select id="patientSelect" class="form-control">
+            <option value="">Choose a patient...</option>
+        </select>
+    </div>
+
+    <div id="patientRecordSection" style="display: none;">
+        <h3>Patient Record</h3>
+        <div id="recordDisplay"></div>
+        <button id="editRecordBtn" class="btn btn-primary">Edit Record</button>
+    </div>
+
+    <div id="editForm" style="display: none;">
+        <h3>Edit Patient Record</h3>
+        <form id="recordForm">
+            <div class="form-group">
+                <label for="medical_history">Medical History:</label>
+                <textarea id="medical_history" name="medical_history" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="allergies">Allergies:</label>
+                <textarea id="allergies" name="allergies" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="blood_type">Blood Type:</label>
+                <input type="text" id="blood_type" name="blood_type">
+            </div>
+            <div class="form-group">
+                <label for="emergency_contact">Emergency Contact:</label>
+                <input type="text" id="emergency_contact" name="emergency_contact">
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" id="cancelEdit" class="btn btn-secondary">Cancel</button>
+        </form>
+    </div>
+
+    <div class="dashboard-footer">
+        <button id="backButton" class="btn btn-secondary">Back to Clinician Dashboard</button>
+    </div>
+</div>
+
+<script type="module">
+    import { apiClient } from '/static/js/api/client.js';
+
+    let currentPatientId = null;
+    let currentRecord = null;
+
+    async function loadPatients() {
+        try {
+            const response = await apiClient.getAllUsers();
+            if (response.success) {
+                const patients = response.users.filter(user => user.role === 'patient');
+                const select = document.getElementById('patientSelect');
+                patients.forEach(patient => {
+                    const option = document.createElement('option');
+                    option.value = patient.id;
+                    option.textContent = `${patient.first_name} ${patient.last_name} (${patient.email})`;
+                    select.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading patients:', error);
+        }
+    }
+
+    async function loadPatientRecord(patientId) {
+        try {
+            const response = await apiClient.getPatientRecord(patientId);
+            if (response.success && response.record) {
+                currentPatientId = patientId;
+                currentRecord = response.record;
+                displayRecord(response.record);
+                document.getElementById('patientRecordSection').style.display = 'block';
+            } else {
+                currentPatientId = null;
+                currentRecord = null;
+                document.getElementById('recordDisplay').innerHTML = '<p>No record found for this patient.</p>';
+                document.getElementById('patientRecordSection').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error loading record:', error);
+            document.getElementById('recordDisplay').innerHTML = '<p>Error loading record.</p>';
+        }
+    }
+
+    function displayRecord(record) {
+        document.getElementById('recordDisplay').innerHTML = `
+            <p><strong>Medical History:</strong> ${record.medical_history || 'Not provided'}</p>
+            <p><strong>Allergies:</strong> ${record.allergies || 'None'}</p>
+            <p><strong>Blood Type:</strong> ${record.blood_type || 'Unknown'}</p>
+            <p><strong>Emergency Contact:</strong> ${record.emergency_contact || 'Not provided'}</p>
+        `;
+    }
+
+    function populateEditForm(record) {
+        document.getElementById('medical_history').value = record.medical_history || '';
+        document.getElementById('allergies').value = record.allergies || '';
+        document.getElementById('blood_type').value = record.blood_type || '';
+        document.getElementById('emergency_contact').value = record.emergency_contact || '';
+    }
+
+    document.getElementById('patientSelect').addEventListener('change', function() {
+        const patientId = this.value;
+        if (patientId) {
+            loadPatientRecord(patientId);
+        } else {
+            document.getElementById('patientRecordSection').style.display = 'none';
+        }
+    });
+
+    document.getElementById('editRecordBtn').addEventListener('click', function() {
+        if (currentRecord) {
+            populateEditForm(currentRecord);
+            document.getElementById('editForm').style.display = 'block';
+            document.getElementById('patientRecordSection').style.display = 'none';
+        }
+    });
+
+    document.getElementById('cancelEdit').addEventListener('click', function() {
+        document.getElementById('editForm').style.display = 'none';
+        document.getElementById('patientRecordSection').style.display = 'block';
+    });
+
+    document.getElementById('recordForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!currentPatientId) return;
+
+        const formData = new FormData(this);
+        const updateData = {
+            medical_history: formData.get('medical_history'),
+            allergies: formData.get('allergies'),
+            blood_type: formData.get('blood_type'),
+            emergency_contact: formData.get('emergency_contact')
+        };
+
+        try {
+            const response = await apiClient.updatePatientRecord(currentPatientId, updateData);
+            if (response.success) {
+                alert('Record updated successfully!');
+                loadPatientRecord(currentPatientId);
+                document.getElementById('editForm').style.display = 'none';
+                document.getElementById('patientRecordSection').style.display = 'block';
+            } else {
+                alert('Error updating record: ' + response.message);
+            }
+        } catch (error) {
+            console.error('Error updating record:', error);
+            alert('Error updating record.');
+        }
+    });
+
+    document.getElementById('backButton').addEventListener('click', function() {
+        window.location.href = '/clinician-dashboard';
+    });
+
+    loadPatients();
+</script>
+{% endblock %}

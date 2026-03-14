@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block title %}User Management{% endblock %}
+{% block content %}
+<h2>User Management</h2>
+<div class="dashboard-cards">
+    <div class="card">
+        <h3>Clinicians</h3>
+        <p>View, add, update, or deactivate clinicians.</p>
+        <a href="/user_management/clinicians" class="btn btn-primary">Manage Clinicians</a>
+    </div>
+    <div class="card">
+        <h3>Patients</h3>
+        <p>View, add, update, or deactivate patients.</p>
+        <a href="/user_management/patients" class="btn btn-primary">Manage Patients</a>
+    </div>
+    <div class="card">
+        <h3>Admins</h3>
+        <p>View, add, update, or deactivate admin users.</p>
+        <a href="/user_management/admins" class="btn btn-primary">Manage Admins</a>
+    </div>
+</div>
+<div class="dashboard-footer">
+    <button id="backButton" class="btn btn-secondary">Back to Admin Dashboard</button>
+</div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = '/admin-dashboard';
+});
+</script>
+{% endblock %}

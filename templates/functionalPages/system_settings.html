@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}System Settings{% endblock %}
+{% block content %}
+<h2>System Settings</h2>
+<div class="dashboard-cards">
+    <div class="card">
+        <h3>Security Settings</h3>
+        <p>Configure security, compliance, and privacy options.</p>
+        <a href="/api/admin/system-settings" class="btn btn-primary">Configure Security</a>
+    </div>
+    <div class="card">
+        <h3>Application Settings</h3>
+        <p>Manage application preferences and system parameters.</p>
+        <a href="/api/admin/system-settings" class="btn btn-primary">Manage Application</a>
+    </div>
+</div>
+<div class="dashboard-footer">
+    <button id="backButton" class="btn btn-secondary">Back to Admin Dashboard</button>
+</div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = '/admin-dashboard';
+});
+</script>
+{% endblock %}

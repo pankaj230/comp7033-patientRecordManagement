@@ -2,9 +2,45 @@
 {% block title %}Admin Dashboard{% endblock %}
 {% block content %}
     <h2>Admin Dashboard</h2>
-    <p>Manage users, audit logs, and system settings.</p>
-    <ul>
-        <li><a href="/audit_logs">Audit Logs</a></li>
-        <li><a href="/user_management">User Management</a></li>
-    </ul>
+    <div class="dashboard-cards">
+        <div class="card">
+            <h3>User Management</h3>
+            <p>Manage users, clinicians, and patients. Add, update, or deactivate accounts.</p>
+            <div class="card-btn-container">
+                <a href="/user_management" class="btn btn-primary">Go to User Management</a>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Audit Logs</h3>
+            <p>View system audit logs for accountability and compliance.</p>
+            <div class="card-btn-container">
+                <a href="/audit_logs" class="btn btn-primary">Go to Audit Logs</a>
+            </div>
+        </div>
+        <div class="card">
+            <h3>System Settings</h3>
+            <p>Configure application settings, security, and compliance options.</p>
+            <div class="card-btn-container">
+                <a href="/system_settings" class="btn btn-primary">Go to System Settings</a>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-footer">
+        <button id="logoutButton" class="btn btn-secondary">Logout</button>
+    </div>
+{% endblock %}
+{% block styles %}
+<link rel="stylesheet" href="/static/style.css">
+{% endblock %}
+{% block scripts %}
+<script type="module">
+    import { authManager } from '/static/js/auth/manager.js';
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if (confirm('Are you sure you want to logout?')) {
+            authManager.logout();
+            authManager.redirectToHome();
+        }
+    });
+</script>
 {% endblock %}
