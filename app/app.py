@@ -1,9 +1,12 @@
 import os
+import sys
 from flask import Flask, render_template, jsonify
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from dotenv import load_dotenv
 from datetime import timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 load_dotenv()
 
@@ -57,11 +60,6 @@ def login():
     return render_template('login.html')
 
 
-@app.route('/register')
-def register():
-    return render_template('register.html')
-
-
 @app.route('/patient-dashboard')
 def patient_dashboard():
     return render_template('roleSpecificDashboard/patient_dashboard.html')
@@ -74,6 +72,45 @@ def clinician_dashboard():
 @app.route('/admin-dashboard')
 def admin_dashboard():
     return render_template('roleSpecificDashboard/admin_dashboard.html')
+
+
+@app.route('/patient_records')
+def patient_records():
+    return render_template('functionalPages/patient_records.html')
+
+
+@app.route('/prescriptions')
+def prescriptions():
+    return render_template('functionalPages/prescriptions.html')
+
+
+@app.route('/user_management')
+def user_management():
+    return render_template('functionalPages/user_management.html')
+
+@app.route('/user_management/clinicians')
+def manage_clinicians():
+    return render_template('functionalPages/manage_clinicians.html')
+
+@app.route('/user_management/patients')
+def manage_patients():
+    return render_template('functionalPages/manage_patients.html')
+
+@app.route('/user_management/admins')
+def manage_admins():
+    return render_template('functionalPages/manage_admins.html')
+
+@app.route('/audit_logs')
+def audit_logs():
+    return render_template('functionalPages/audit_logs.html')
+
+@app.route('/system_settings')
+def system_settings():
+    return render_template('functionalPages/system_settings.html')
+
+@app.route('/register', methods=['GET'])
+def register_redirect():
+    return render_template('register.html')
 
 
 # ============================================================================
@@ -126,6 +163,13 @@ def unauthorized(error):
 
 
 # ============================================================================
+# JWT Configuration
+# ============================================================================
+
+jwt = JWTManager(app)
+
+
+# ============================================================================
 # Application Entry Point
 # ============================================================================
 
@@ -134,11 +178,11 @@ if __name__ == '__main__':
         with open('.env', 'w') as f:
             f.write('SECRET_KEY=secret-key-here\n')
             f.write('JWT_SECRET=jwt-secret-here\n')
-            f.write('MONGODB_URI=mongodb+srv://user:<pass>@cluster0.lnrqzpn.mongodb.net/ \n')
+            f.write('MONGODB_URI=mongodb+srv://username:<passkey>@cluster0.lnrqzpn.mongodb.net/ \n')
 
     debug_mode = os.getenv('FLASK_ENV', 'development') == 'development'
     app.run(
         host='0.0.0.0',
-        port=5000,
+        port=5001,
         debug=debug_mode
     )

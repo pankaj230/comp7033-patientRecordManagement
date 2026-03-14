@@ -2,7 +2,6 @@ import sqlite3
 import bcrypt
 from datetime import datetime
 from typing import Optional, Dict, Any
-import pymongo
 from pymongo import MongoClient
 import os
 
@@ -17,11 +16,14 @@ class SQLiteDB:
         self.init_db()
 
     def get_connection(self):
-        return sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path, timeout=30, check_same_thread=False)
+        conn.execute('PRAGMA journal_mode=WAL;')
+        return conn
 
     def init_db(self):
         conn = self.get_connection()
         cursor = conn.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL;')
 
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
@@ -58,16 +60,14 @@ class SQLiteDB:
                    last_name: str, role: str) -> Dict[str, Any]:
         try:
             password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-            conn = self.get_connection()
-            cursor = conn.cursor()
-            cursor.execute('''
-                INSERT INTO users (email, password_hash, first_name, last_name, role)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (email, password_hash, first_name, last_name, role))
-            user_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
-
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO users (email, password_hash, first_name, last_name, role)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (email, password_hash, first_name, last_name, role))
+                user_id = cursor.lastrowid
+                conn.commit()
             return {
                 'success': True,
                 'user_id': user_id,
@@ -85,16 +85,13 @@ class SQLiteDB:
             }
 
     def get_user_by_email(self, email: str) -> Optional[Dict[str, Any]]:
-        conn = self.get_connection()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            SELECT id, email, password_hash, first_name, last_name, role, is_active
-            FROM users WHERE email = ?
-        ''', (email,))
-        user = cursor.fetchone()
-        conn.close()
-
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT id, email, password_hash, first_name, last_name, role, is_active
+                FROM users WHERE email = ?
+            ''', (email,))
+            user = cursor.fetchone()
         if user:
             return {
                 'id': user[0],
@@ -108,17 +105,13 @@ class SQLiteDB:
         return None
 
     def get_user_by_id(self, user_id: int) -> Optional[Dict[str, Any]]:
-        conn = self.get_connection()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            SELECT id, email, first_name, last_name, role, is_active
-            FROM users WHERE id = ?
-        ''', (user_id,))
-
-        user = cursor.fetchone()
-        conn.close()
-
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT id, email, first_name, last_name, role, is_active
+                FROM users WHERE id = ?
+            ''', (user_id,))
+            user = cursor.fetchone()
         if user:
             return {
                 'id': user[0],
@@ -137,38 +130,31 @@ class SQLiteDB:
                      resource_id: Optional[str] = None, details: Optional[str] = None,
                      ip_address: Optional[str] = None) -> bool:
         try:
-            conn = self.get_connection()
-            cursor = conn.cursor()
-
-            cursor.execute('''
-                INSERT INTO audit_logs 
-                (user_id, action, resource, resource_id, details, ip_address)
-                VALUES (?, ?, ?, ?, ?, ?)
-            ''', (user_id, action, resource, resource_id, details, ip_address))
-
-            conn.commit()
-            conn.close()
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO audit_logs 
+                    (user_id, action, resource, resource_id, details, ip_address)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ''', (user_id, action, resource, resource_id, details, ip_address))
+                conn.commit()
             return True
         except Exception as e:
             print(f"Error adding audit log: {str(e)}")
             return False
 
     def get_audit_logs(self, limit: int = 100) -> list:
-        conn = self.get_connection()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            SELECT al.id, u.email, al.action, al.resource, al.resource_id, 
-                   al.details, al.timestamp
-            FROM audit_logs al
-            JOIN users u ON al.user_id = u.id
-            ORDER BY al.timestamp DESC
-            LIMIT ?
-        ''', (limit,))
-
-        logs = cursor.fetchall()
-        conn.close()
-
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT al.id, u.email, al.action, al.resource, al.resource_id, 
+                       al.details, al.timestamp
+                FROM audit_logs al
+                JOIN users u ON al.user_id = u.id
+                ORDER BY al.timestamp DESC
+                LIMIT ?
+            ''', (limit,))
+            logs = cursor.fetchall()
         return [
             {
                 'id': log[0],
@@ -188,8 +174,8 @@ class SQLiteDB:
 # ============================================================================
 
 class MongoDB:
-    def __init__(self, uri: str = None, db_name: str = 'patient_records'):
-        self.uri = uri or os.getenv('MONGODB_URI', 'mongodb+srv://user:<pass>@cluster0.lnrqzpn.mongodb.net/')
+    def __init__(self, uri: str = None, db_name: str = 'Health'):
+        self.uri = uri or os.getenv('MONGODB_URI', 'mongodb+srv://username:<passkey>@cluster0.lnrqzpn.mongodb.net/')
         self.db_name = db_name
         self.client = None
         self.db = None
@@ -211,7 +197,7 @@ class MongoDB:
             self.connected = False
 
     def create_indexes(self):
-        if self.db:
+        if self.db is not None:
             self.db.patient_records.create_index('patient_id', unique=True)
             self.db.patient_records.create_index('created_at')
 
@@ -317,6 +303,8 @@ class MongoDB:
 
     def create_prescription(self, patient_id: int, clinician_id: int,
                            medication: str, dosage: str, duration: str) -> bool:
+        if not self.connected:
+            return False
         try:
             prescription = {
                 'patient_id': patient_id,
@@ -334,6 +322,8 @@ class MongoDB:
             return False
 
     def get_patient_prescriptions(self, patient_id: int) -> list:
+        if not self.connected:
+            return []
         try:
             prescriptions = list(self.db.prescriptions.find({'patient_id': patient_id}))
             return prescriptions
@@ -346,7 +336,6 @@ class MongoDB:
             self.client.close()
 
 
-# Initialize databases
 sqlite_db = SQLiteDB()
 mongodb = MongoDB()
 

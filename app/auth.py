@@ -1,13 +1,8 @@
-"""
-Authentication utilities and middleware for Patient Record Management System
-"""
-
 import os
 from functools import wraps
 from datetime import timedelta
 from flask import request, jsonify, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-import jwt
 from app.models import sqlite_db
 
 # ============================================================================
@@ -82,6 +77,12 @@ def login_user(email: str, password: str, role: str = None) -> dict:
             'message': 'Invalid email or password'
         }
 
+    if not isinstance(user, dict):
+        return {
+            'success': False,
+            'message': 'Database error'
+        }
+
     if not user['is_active']:
         return {
             'success': False,
@@ -95,20 +96,14 @@ def login_user(email: str, password: str, role: str = None) -> dict:
             'message': 'Invalid email or password'
         }
 
-    # Verify role if provided
     if role and user['role'] != role:
         return {
             'success': False,
-            'message': 'Invalid role for this account'
+            'message': 'Account does not have the selected role'
         }
 
-    # Generate JWT token
     access_token = create_access_token(
-        identity={
-            'id': user['id'],
-            'email': user['email'],
-            'role': user['role']
-        }
+        identity=str(user['id'])
     )
 
     return {
@@ -144,7 +139,14 @@ def role_required(*roles):
         @jwt_required()
         def wrapper(*args, **kwargs):
             identity = get_jwt_identity()
-            user_role = identity.get('role')
+            user_id = int(identity)
+            user = sqlite_db.get_user_by_id(user_id)
+            if not user or not user['is_active']:
+                return jsonify({
+                    'success': False,
+                    'message': 'User not found or inactive'
+                }), 401
+            user_role = user['role']
 
             if user_role not in roles:
                 return jsonify({
@@ -190,7 +192,7 @@ def log_audit(action: str, resource: str, resource_id: str = None,
     """
     try:
         identity = get_jwt_identity()
-        user_id = identity.get('id')
+        user_id = int(identity)
         ip_address = request.remote_addr
 
         sqlite_db.add_audit_log(

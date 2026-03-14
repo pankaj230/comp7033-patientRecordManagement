@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from app.auth import admin_required, log_audit, sanitize_input, register_user
 from app.models import sqlite_db
 
@@ -11,10 +11,19 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/api/admin')
 # ============================================================================
 
 @admin_bp.route('/users', methods=['GET'])
-@admin_required
+@jwt_required()
 def get_all_users():
-    """Get all users (Admin only)"""
+    """Get all users (Admin and Clinician)"""
     try:
+        identity = get_jwt_identity()
+        user_id = int(identity)
+        user = sqlite_db.get_user_by_id(user_id)
+        if not user or user['role'] not in ['admin', 'clinician']:
+            return jsonify({
+                'success': False,
+                'message': 'Access denied'
+            }), 403
+
         conn = sqlite_db.get_connection()
         cursor = conn.cursor()
 
@@ -177,6 +186,35 @@ def toggle_user_status(user_id):
         }), 500
 
 
+@admin_bp.route('/admins', methods=['GET'])
+@admin_required
+def get_admins():
+    try:
+        conn = sqlite_db.get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, email, first_name, last_name, role, is_active, created_at
+            FROM users WHERE role = 'admin' ORDER BY created_at DESC
+        """)
+        admins = cursor.fetchall()
+        conn.close()
+        admins_list = [
+            {
+                'id': a[0],
+                'email': a[1],
+                'first_name': a[2],
+                'last_name': a[3],
+                'role': a[4],
+                'is_active': a[5],
+                'created_at': a[6]
+            }
+            for a in admins
+        ]
+        return jsonify({'success': True, 'admins': admins_list}), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error retrieving admins: {str(e)}'}), 500
+
+
 # ============================================================================
 # Audit Log Routes
 # ============================================================================
@@ -295,3 +333,20 @@ def get_dashboard_stats():
             'message': f'Error retrieving dashboard stats: {str(e)}'
         }), 500
 
+
+# @admin_bp.route('/seed-clinicians', methods=['POST'])
+# @admin_required
+# def seed_clinicians():
+#     try:
+#         clinicians = [
+#             {'email': f'dr{i}@hospital.com', 'password': f'clinician{i}2026', 'first_name': f'Dr{i}', 'last_name': f'Clinician{i}', 'role': 'clinician'}
+#             for i in range(2, 12)
+#         ]
+#         created = []
+#         for c in clinicians:
+#             result = register_user(c['email'], c['password'], c['first_name'], c['last_name'], c['role'])
+#             if result['success']:
+#                 created.append({'email': c['email'], 'password': c['password'], 'user_id': result['user_id']})
+#         return jsonify({'success': True, 'created': created}), 201
+#     except Exception as e:
+#         return jsonify({'success': False, 'message': str(e)}), 500
