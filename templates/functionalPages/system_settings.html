@@ -3,15 +3,39 @@
 {% block content %}
 <h2>System Settings</h2>
 <div class="dashboard-cards">
-    <div class="card">
-        <h3>Security Settings</h3>
-        <p>Configure security, compliance, and privacy options.</p>
-        <a href="/api/admin/system-settings" class="btn btn-primary">Configure Security</a>
-    </div>
-    <div class="card">
+    <div class="card" style="width:100%">
         <h3>Application Settings</h3>
-        <p>Manage application preferences and system parameters.</p>
-        <a href="/api/admin/system-settings" class="btn btn-primary">Manage Application</a>
+        <p>Configure system parameters and preferences.</p>
+        <form id="settingsForm">
+            <div class="form-group">
+                <label for="session_timeout">Session Timeout (minutes)</label>
+                <input type="number" id="session_timeout" name="session_timeout" value="1440" min="30" max="1440">
+            </div>
+            <div class="form-group">
+                <label for="max_login_attempts">Max Login Attempts</label>
+                <input type="number" id="max_login_attempts" name="max_login_attempts" value="5" min="1" max="10">
+            </div>
+            <div class="form-group">
+                <label for="audit_enabled">Enable Audit Logging</label>
+                <input type="checkbox" id="audit_enabled" name="audit_enabled" checked>
+            </div>
+            <div class="form-group">
+                <label for="email_notifications">Enable Email Notifications</label>
+                <input type="checkbox" id="email_notifications" name="email_notifications">
+            </div>
+            <div class="form-group">
+                <label for="maintenance_mode">Maintenance Mode</label>
+                <input type="checkbox" id="maintenance_mode" name="maintenance_mode">
+            </div>
+            <div class="form-group">
+                <label for="default_user_role">Default User Role</label>
+                <select id="default_user_role" name="default_user_role">
+                    <option value="patient">Patient</option>
+                    <option value="clinician">Clinician</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
     </div>
 </div>
 <div class="dashboard-footer">
@@ -19,6 +43,71 @@
 </div>
 {% endblock %}
 {% block styles %}
+<style>
+.dashboard-cards {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f5f5f5 100%);
+    border: 2px solid #39803c;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+    padding: 36px 28px;
+    width: 340px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.card:hover {
+    box-shadow: 0 12px 32px rgba(44, 62, 80, 0.18);
+    transform: scale(1.03);
+}
+.card h3 {
+    margin-top: 0;
+    color: #39803c;
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card p {
+    color: #555;
+    margin: 18px 0 0 0;
+    font-size: 1.05em;
+    text-align: center;
+}
+.card .btn {
+    margin-top: 22px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #39803c;
+    font-weight: 500;
+}
+.form-group input[type="number"], .form-group input[type="checkbox"], .form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.dashboard-footer {
+    margin-top: 40px;
+    text-align: center;
+}
+</style>
 {% endblock %}
 {% block scripts %}
 <script type="module">
