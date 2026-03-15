@@ -3,15 +3,22 @@
 {% block content %}
 <h2>Audit Logs</h2>
 <div class="dashboard-cards">
-    <div class="card">
-        <h3>View Logs</h3>
-        <p>Review system activity and user actions for compliance.</p>
-        <a href="/api/admin/audit-logs" class="btn btn-primary">View Logs</a>
-    </div>
-    <div class="card">
-        <h3>Export Logs</h3>
-        <p>Export audit logs for external review or backup.</p>
-        <a href="/api/admin/audit-logs?export=true" class="btn btn-primary">Export Logs</a>
+    <div class="card" style="width:100%">
+        <h3>System Audit Logs</h3>
+        <p>Review all system activity and user actions.</p>
+        <table id="auditLogsTable" class="data-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Resource</th>
+                    <th>Resource ID</th>
+                    <th>Details</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 <div class="dashboard-footer">
@@ -19,9 +26,105 @@
 </div>
 {% endblock %}
 {% block styles %}
+<style>
+.dashboard-cards {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f5f5f5 100%);
+    border: 2px solid #39803c;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+    padding: 36px 28px;
+    width: 340px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.card:hover {
+    box-shadow: 0 12px 32px rgba(44, 62, 80, 0.18);
+    transform: scale(1.03);
+}
+.card h3 {
+    margin-top: 0;
+    color: #39803c;
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card p {
+    color: #555;
+    margin: 18px 0 0 0;
+    font-size: 1.05em;
+    text-align: center;
+}
+.card .btn {
+    margin-top: 22px;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid black;
+}
+.data-table th, .data-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid black;
+}
+.data-table th {
+    background-color: #39803c;
+    color: white;
+}
+.data-table tr:hover {
+    background-color: #f5f5f5;
+}
+.dashboard-footer {
+    margin-top: 40px;
+    text-align: center;
+}
+</style>
 {% endblock %}
 {% block scripts %}
 <script type="module">
+async function loadAuditLogs() {
+    try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/admin/audit-logs', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (data.success && data.logs) {
+            const tbody = document.querySelector('#auditLogsTable tbody');
+            tbody.innerHTML = '';
+            data.logs.forEach(log => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${log.user_email}</td>
+                    <td>${log.action}</td>
+                    <td>${log.resource}</td>
+                    <td>${log.resource_id || 'N/A'}</td>
+                    <td>${log.details || 'N/A'}</td>
+                    <td>${log.timestamp}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading audit logs:', error);
+    }
+}
+loadAuditLogs();
 document.getElementById('backButton').addEventListener('click', function() {
     window.location.href = '/admin-dashboard';
 });

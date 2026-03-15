@@ -22,12 +22,12 @@
     <div class="card">
         <h3>Add Admin</h3>
         <p>Add a new admin user to the system.</p>
-        <a href="#" class="btn btn-primary">Add Admin</a>
+        <button id="addAdminBtn" class="btn btn-primary">Add Admin</button>
     </div>
     <div class="card">
         <h3>Deactivate Admin</h3>
         <p>Deactivate or update admin accounts.</p>
-        <a href="#" class="btn btn-primary">Deactivate Admin</a>
+        <button id="deactivateAdminBtn" class="btn btn-primary">Deactivate Admin</button>
     </div>
 </div>
 <div class="dashboard-footer">
@@ -35,6 +35,83 @@
 </div>
 {% endblock %}
 {% block styles %}
+<style>
+.dashboard-cards {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.card {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f5f5f5 100%);
+    border: 2px solid #39803c;
+    border-radius: 18px;
+    box-shadow: 0 6px 24px rgba(44, 62, 80, 0.13);
+    padding: 36px 28px;
+    width: 340px;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transition: box-shadow 0.2s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+.card:hover {
+    box-shadow: 0 12px 32px rgba(44, 62, 80, 0.18);
+    transform: scale(1.03);
+}
+.card h3 {
+    margin-top: 0;
+    color: #39803c;
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.card p {
+    color: #555;
+    margin: 18px 0 0 0;
+    font-size: 1.05em;
+    text-align: center;
+}
+.card .btn {
+    margin-top: 22px;
+}
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 4px solid black !important;
+    border-radius: 8px;
+    overflow: hidden;
+    background-clip: padding-box;
+}
+.data-table thead {
+    border-bottom: 4px solid black;
+}
+.data-table tr {
+    border-bottom: 2px solid black;
+}
+.data-table th, .data-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid black;
+}
+.data-table th {
+    background-color: #39803c;
+    color: white;
+}
+.data-table tr:hover {
+    background-color: #f5f5f5;
+}
+.dashboard-footer {
+    margin-top: 40px;
+    text-align: center;
+}
+</style>
 {% endblock %}
 {% block scripts %}
 <script type="module">
@@ -64,6 +141,7 @@ async function loadAdmins() {
         console.error('Error loading admins:', error);
     }
 }
+
 loadAdmins();
 document.getElementById('backButton').addEventListener('click', function() {
     window.location.href = '/user_management';
