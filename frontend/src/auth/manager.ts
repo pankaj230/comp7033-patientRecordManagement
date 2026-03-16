@@ -38,9 +38,9 @@ export class AuthManager {
     localStorage.removeItem('current_user');
   }
 
-  async login(email: string, password: string, role: string): Promise<AuthResponse> {
+  async login(email: string, password: string): Promise<AuthResponse> {
     try {
-      const response = await apiClient.login({ email, password, role });
+      const response = await apiClient.login({ email, password });
 
       if (response.success && response.user && response.access_token) {
         this.currentUser = response.user;
@@ -92,19 +92,6 @@ export class AuthManager {
     return this.currentUser?.role === role;
   }
 
-  isAdmin(): boolean {
-    return this.hasRole('admin');
-  }
-
-  isClinician(): boolean {
-    return this.hasRole('clinician');
-  }
-
-  isPatient(): boolean {
-    return this.hasRole('patient');
-  }
-
-
   requireAuth(): boolean {
     if (!this.isAuthenticated()) {
       this.redirectToLogin();
@@ -122,19 +109,6 @@ export class AuthManager {
     }
     return true;
   }
-
-  requireAdmin(): boolean {
-    return this.requireRole('admin');
-  }
-
-  requireClinician(): boolean {
-    return this.requireRole('clinician');
-  }
-
-  requirePatient(): boolean {
-    return this.requireRole('patient');
-  }
-
 
   redirectToLogin(): void {
     window.location.href = '/login';

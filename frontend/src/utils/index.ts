@@ -10,25 +10,7 @@ export class ValidationUtils {
     return password.length >= 8;
   }
 
-  static isValidPhone(phone: string): boolean {
-    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
-    return phoneRegex.test(phone);
-  }
 
-  static isValidDate(dateString: string): boolean {
-    const date = new Date(dateString);
-    return !isNaN(date.getTime());
-  }
-
-  static isFutureDate(dateString: string): boolean {
-    const date = new Date(dateString);
-    const now = new Date();
-    return date > now;
-  }
-
-  static sanitizeInput(input: string): string {
-    return input.trim().replace(/[<>]/g, '');
-  }
 }
 
 
@@ -89,17 +71,6 @@ export class MedicalUtils {
     return 'High';
   }
 
-  static getBMICategory(bmi: number): string {
-    if (bmi < 18.5) return 'Underweight';
-    if (bmi < 25) return 'Normal';
-    if (bmi < 30) return 'Overweight';
-    return 'Obese';
-  }
-
-  static calculateBMI(weightKg: number, heightCm: number): number {
-    const heightM = heightCm / 100;
-    return weightKg / (heightM * heightM);
-  }
 }
 
 
@@ -205,28 +176,6 @@ export class UIUtils {
       element.style.opacity = '1';
     }
   }
-
-  static confirmDialog(message: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      const result = confirm(message);
-      resolve(result);
-    });
-  }
-
-  static scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  static debounce<T extends (...args: any[]) => any>(
-    func: T,
-    wait: number
-  ): (...args: Parameters<T>) => void {
-    let timeout: number;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  }
 }
 
 export class DataUtils {
@@ -257,15 +206,4 @@ export class DataUtils {
     }));
   }
 
-  static sortByDate<T extends { created_at: string }>(items: T[], ascending: boolean = false): T[] {
-    return items.sort((a, b) => {
-      const dateA = new Date(a.created_at).getTime();
-      const dateB = new Date(b.created_at).getTime();
-      return ascending ? dateA - dateB : dateB - dateA;
-    });
-  }
-
-  static filterByStatus<T extends { status?: string }>(items: T[], status: string): T[] {
-    return items.filter(item => item.status === status);
-  }
 }
