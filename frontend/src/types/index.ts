@@ -87,7 +87,6 @@ export interface Prescription {
 export interface LoginFormData {
   email: string;
   password: string;
-  role: 'patient' | 'clinician' | 'admin';
 }
 
 export interface RegisterFormData {
@@ -98,57 +97,3 @@ export interface RegisterFormData {
   role: 'patient' | 'clinician' | 'admin';
 }
 
-export interface MedicalRecordFormData {
-  medical_history: string;
-  allergies: string;
-  blood_type: string;
-  emergency_contact: string;
-  age: number;
-  sex: 'Male' | 'Female';
-  blood_pressure: number;
-  cholesterol: number;
-  fasting_blood_sugar: boolean;
-  resting_ecg: 'Normal' | 'Abnormal';
-  exercise_induced_angina: boolean;
-  diagnosis: string;
-  treatment_plan: string;
-  notes: string;
-}
-
-export interface AppointmentFormData {
-  clinician_id: number;
-  appointment_date: string;
-  reason: string;
-}
-
-export interface PrescriptionFormData {
-  patient_id: number;
-  medication: string;
-  dosage: string;
-  duration: string;
-}
-
-
-export interface DashboardData {
-  user: User;
-  medical_record?: MedicalRecord;
-  appointments?: Appointment[];
-  prescriptions?: Prescription[];
-}
-
-export interface AdminDashboardData {
-  total_users: number;
-  total_patients: number;
-  total_clinicians: number;
-  recent_audit_logs: AuditLog[];
-}
-
-export interface AuditLog {
-  id: number;
-  user_email: string;
-  action: string;
-  resource: string;
-  resource_id?: string;
-  details?: string;
-  timestamp: string;
-}

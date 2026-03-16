@@ -386,7 +386,6 @@ def get_clinician_patients():
     try:
         identity = get_jwt_identity()
         clinician_id = int(identity)
-        # Example: patients assigned by appointments
         conn = sqlite_db.get_connection()
         cursor = conn.cursor()
         cursor.execute('''

@@ -4,6 +4,7 @@ import { FormatUtils, DataUtils } from '../utils/index.js';
 
 class Dashboard {
   private userInfo!: HTMLElement;
+  private alertContainer!: HTMLElement;
   private medicalRecordsSection!: HTMLElement;
   private appointmentsSection!: HTMLElement;
   private prescriptionsSection!: HTMLElement;
@@ -20,6 +21,7 @@ class Dashboard {
 
   private initializeElements(): void {
     this.userInfo = document.getElementById('userInfo') as HTMLElement;
+    this.alertContainer = document.getElementById('alertContainer') as HTMLElement;
     this.medicalRecordsSection = document.getElementById('medicalRecordsSection') as HTMLElement;
     this.appointmentsSection = document.getElementById('appointmentsSection') as HTMLElement;
     this.prescriptionsSection = document.getElementById('prescriptionsSection') as HTMLElement;
@@ -33,6 +35,25 @@ class Dashboard {
     if (this.bookAppointmentBtn) {
       this.bookAppointmentBtn.addEventListener('click', this.handleBookAppointment.bind(this));
     }
+    const patientRecordsBtn = document.getElementById('patientRecordsBtn');
+    if (patientRecordsBtn) {
+      patientRecordsBtn.addEventListener('click', async () => {
+        const user = authManager.getCurrentUser();
+        if (user && user.role === 'clinician') {
+          await this.loadAndShowClinicianPatients();
+        }
+      });
+    }
+    // Setup modal close button for patients modal
+    const patientsModal = document.getElementById('patientsModal');
+    const closeBtns = document.querySelectorAll('.close');
+    closeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        if (patientsModal && patientsModal.style.display !== 'none') {
+          patientsModal.style.display = 'none';
+        }
+      });
+    });
     const closeBtn = document.querySelector('.close') as HTMLElement;
     if (closeBtn) {
       closeBtn.addEventListener('click', this.closeModal.bind(this));
@@ -54,14 +75,15 @@ class Dashboard {
       const user = authManager.getCurrentUser();
       if (!user) return;
       this.displayUserInfo(user);
+      this.showWelcomeAlert(user);
       if (user.role === 'patient') {
         await this.loadMedicalRecords(user.id);
         await this.loadAppointments(user.id);
         await this.loadPrescriptions(user.id);
       } else if (user.role === 'clinician') {
-        await this.loadClinicianPatients();
+        // Do not fetch patients by default
+        // Only fetch when Go to Patient Records is clicked
       } else if (user.role === 'admin') {
-        // Optionally load admin-specific data here
         this.patientsSection.innerHTML = '<div class="info">Admin dashboard features go here.</div>';
       }
     } catch (error) {
@@ -78,6 +100,62 @@ class Dashboard {
         <p><strong>ID:</strong> ${user.id}</p>
       </div>
     `;
+  }
+
+  private showWelcomeAlert(user: any): void {
+    const roleMessages: { [key: string]: string } = {
+      'patient': 'Welcome to your patient dashboard! Here you can view your medical records, appointments, and prescriptions.',
+      'clinician': 'Welcome to your clinician dashboard! Here you can manage patient records and prescriptions.',
+      'admin': 'Welcome to your admin dashboard! Here you can manage users and system settings.'
+    };
+
+    const message = roleMessages[user.role] || 'Welcome to your dashboard!';
+    this.showAlert(message, 'success');
+  }
+
+  private showAlert(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info'): void {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+
+    if (this.alertContainer) {
+      alertDiv.style.cssText = `
+        padding: 15px 20px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: 1px solid;
+      `;
+
+      switch (type) {
+        case 'success':
+          alertDiv.style.backgroundColor = '#d4edda';
+          alertDiv.style.color = '#155724';
+          alertDiv.style.borderColor = '#c3e6cb';
+          break;
+        case 'error':
+          alertDiv.style.backgroundColor = '#f8d7da';
+          alertDiv.style.color = '#721c24';
+          alertDiv.style.borderColor = '#f5c6cb';
+          break;
+        case 'warning':
+          alertDiv.style.backgroundColor = '#fff3cd';
+          alertDiv.style.color = '#856404';
+          alertDiv.style.borderColor = '#ffeeba';
+          break;
+        default:
+          alertDiv.style.backgroundColor = '#d1ecf1';
+          alertDiv.style.color = '#0c5460';
+          alertDiv.style.borderColor = '#bee5eb';
+      }
+
+      this.alertContainer.appendChild(alertDiv);
+
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.parentNode.removeChild(alertDiv);
+        }
+      }, 10000);
+    }
   }
 
   private async loadMedicalRecords(patientId: number): Promise<void> {
@@ -228,25 +306,41 @@ class Dashboard {
     `;
   }
 
-  private async loadClinicianPatients(): Promise<void> {
+
+  private async loadAndShowClinicianPatients(): Promise<void> {
     try {
       const response = await apiClient.getClinicianPatients();
+      const patientsList = document.getElementById('patientsList');
+      const patientsModal = document.getElementById('patientsModal') as HTMLElement;
+
       if (response.success && response.patients) {
-        this.displayClinicianPatients(response.patients);
+        this.displayClinicianPatientsInModal(response.patients, patientsList);
+        patientsModal.style.display = 'flex';
       } else {
-        this.patientsSection.innerHTML = `<div class="no-data"><p>No appointed patients found.</p></div>`;
+        if (patientsList) {
+          patientsList.innerHTML = `<div class="no-data"><p>No appointed patients found.</p></div>`;
+        }
+        patientsModal.style.display = 'flex';
       }
     } catch (error) {
       console.error('Error loading clinician patients:', error);
-      this.patientsSection.innerHTML = `<div class="error"><p>Failed to load patients. Please try again later.</p></div>`;
+      const patientsList = document.getElementById('patientsList');
+      const patientsModal = document.getElementById('patientsModal') as HTMLElement;
+      if (patientsList) {
+        patientsList.innerHTML = `<div class="error"><p>Failed to load patients. Please try again later.</p></div>`;
+      }
+      patientsModal.style.display = 'flex';
     }
   }
 
-  private displayClinicianPatients(patients: any[]): void {
+  private displayClinicianPatientsInModal(patients: any[], container: HTMLElement | null): void {
+    if (!container) return;
+
     if (patients.length === 0) {
-      this.patientsSection.innerHTML = `<div class="no-data"><p>No appointed patients found.</p></div>`;
+      container.innerHTML = `<div class="no-data"><p>No appointed patients found.</p></div>`;
       return;
     }
+
     const patientsHtml = patients.map(p => `
       <div class="patient-card">
         <h5>${FormatUtils.formatUserName(p)}</h5>
@@ -254,12 +348,8 @@ class Dashboard {
         <p><strong>Patient ID:</strong> ${p.id}</p>
       </div>
     `).join('');
-    this.patientsSection.innerHTML = `
-      <div class="patients-list">
-        <h4>Your Appointed Patients</h4>
-        ${patientsHtml}
-      </div>
-    `;
+
+    container.innerHTML = patientsHtml;
   }
 
   private handleLogout(): void {
@@ -334,6 +424,4 @@ class Dashboard {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  new Dashboard();
-});
+export { Dashboard };

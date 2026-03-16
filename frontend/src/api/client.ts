@@ -77,7 +77,7 @@ export class ApiClient {
     }
   }
 
-  async login(credentials: { email: string; password: string; role: string }): Promise<AuthResponse> {
+  async login(credentials: { email: string; password: string }): Promise<AuthResponse> {
     const response = await fetch(`${this.baseURL}/auth/login`, {
       method: 'POST',
       headers: this.getHeaders(false),

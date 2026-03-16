@@ -4,12 +4,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-
 @auth_bp.route('/register', methods=['GET'])
 def register_page():
     """Display registration page"""
     return render_template('register.html')
-
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -92,7 +90,6 @@ def login():
 
         email = sanitize_input(data.get('email', '').strip())
         password = data.get('password', '').strip()
-        role = data.get('role', '').strip()
 
         if not email or not password:
             return jsonify({
@@ -100,7 +97,7 @@ def login():
                 'message': 'Email and password are required'
             }), 400
 
-        result = login_user(email, password, role)
+        result = login_user(email, password)
 
         if result['success']:
             session['user'] = result['user']

@@ -70,7 +70,6 @@
             <p>Already have an account? <a id="loginLink" href="/login">Login here</a></p>
         </div>
     </div>
-    <!-- Removed inline style block, styles are now in register.css -->
     <script type="module">
 import { showAlert } from '/static/js/utils/index.js';
 
@@ -83,7 +82,6 @@ form.addEventListener('submit', async function(e) {
     spinner.style.display = 'block';
     alertContainer.innerHTML = '';
     const formData = new FormData(form);
-    // Use snake_case keys for backend compatibility
     const data = {
         first_name: formData.get('first_name'),
         last_name: formData.get('last_name'),
@@ -102,8 +100,6 @@ form.addEventListener('submit', async function(e) {
         spinner.style.display = 'none';
         if (result.success) {
             showAlert('🎉 ' + (result.message || 'Registration successful! You can now log in.'), 'success', alertContainer);
-            // Keep the alert visible and do not redirect immediately
-            // Optionally, scroll to top for visibility
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             showAlert('❌ ' + (result.message || 'Registration failed. Please check your details and try again.'), 'error', alertContainer);

@@ -6,7 +6,6 @@ class LoginPage {
   private form!: HTMLFormElement;
   private emailInput!: HTMLInputElement;
   private passwordInput!: HTMLInputElement;
-  private roleSelect!: HTMLSelectElement;
   private submitButton!: HTMLButtonElement;
   private registerLink!: HTMLElement;
   private alertContainer!: HTMLElement;
@@ -21,7 +20,6 @@ class LoginPage {
     this.form = document.getElementById('loginForm') as HTMLFormElement;
     this.emailInput = document.getElementById('email') as HTMLInputElement;
     this.passwordInput = document.getElementById('password') as HTMLInputElement;
-    this.roleSelect = document.getElementById('role') as HTMLSelectElement;
     this.submitButton = document.getElementById('submitButton') as HTMLButtonElement;
     this.registerLink = document.getElementById('registerLink') as HTMLElement;
     this.alertContainer = document.getElementById('alertContainer') as HTMLElement;
@@ -89,7 +87,6 @@ class LoginPage {
     const formData: LoginFormData = {
       email: this.emailInput.value.trim(),
       password: this.passwordInput.value,
-      role: this.roleSelect.value as 'patient' | 'clinician' | 'admin',
     };
 
     UIUtils.showLoading(this.submitButton, true);
@@ -97,8 +94,7 @@ class LoginPage {
     try {
       const response = await authManager.login(
         formData.email,
-        formData.password,
-        formData.role
+        formData.password
       );
 
       if (response.success) {
