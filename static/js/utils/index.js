@@ -6,22 +6,6 @@ export class ValidationUtils {
     static isValidPassword(password) {
         return password.length >= 8;
     }
-    static isValidPhone(phone) {
-        const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
-        return phoneRegex.test(phone);
-    }
-    static isValidDate(dateString) {
-        const date = new Date(dateString);
-        return !isNaN(date.getTime());
-    }
-    static isFutureDate(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        return date > now;
-    }
-    static sanitizeInput(input) {
-        return input.trim().replace(/[<>]/g, '');
-    }
 }
 export class FormatUtils {
     static formatDate(dateString) {
@@ -76,19 +60,6 @@ export class MedicalUtils {
         if (chol < 240)
             return 'Borderline High';
         return 'High';
-    }
-    static getBMICategory(bmi) {
-        if (bmi < 18.5)
-            return 'Underweight';
-        if (bmi < 25)
-            return 'Normal';
-        if (bmi < 30)
-            return 'Overweight';
-        return 'Obese';
-    }
-    static calculateBMI(weightKg, heightCm) {
-        const heightM = heightCm / 100;
-        return weightKg / (heightM * heightM);
     }
 }
 export class UIUtils {
@@ -186,22 +157,6 @@ export class UIUtils {
             element.style.opacity = '1';
         }
     }
-    static confirmDialog(message) {
-        return new Promise((resolve) => {
-            const result = confirm(message);
-            resolve(result);
-        });
-    }
-    static scrollToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    static debounce(func, wait) {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func(...args), wait);
-        };
-    }
 }
 export class DataUtils {
     static transformMedicalRecordForDisplay(record) {
@@ -227,16 +182,6 @@ export class DataUtils {
             ...pres,
             formatted_created_at: FormatUtils.formatDateTime(pres.created_at),
         }));
-    }
-    static sortByDate(items, ascending = false) {
-        return items.sort((a, b) => {
-            const dateA = new Date(a.created_at).getTime();
-            const dateB = new Date(b.created_at).getTime();
-            return ascending ? dateA - dateB : dateB - dateA;
-        });
-    }
-    static filterByStatus(items, status) {
-        return items.filter(item => item.status === status);
     }
 }
 //# sourceMappingURL=index.js.map

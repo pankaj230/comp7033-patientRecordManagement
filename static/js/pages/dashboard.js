@@ -133,7 +133,7 @@ class Dashboard {
                 if (alertDiv.parentNode) {
                     alertDiv.parentNode.removeChild(alertDiv);
                 }
-            }, 5000);
+            }, 10000);
         }
     }
     async loadMedicalRecords(patientId) {

@@ -61,7 +61,6 @@ class Dashboard {
       } else if (user.role === 'clinician') {
         await this.loadClinicianPatients();
       } else if (user.role === 'admin') {
-        // Optionally load admin-specific data here
         this.patientsSection.innerHTML = '<div class="info">Admin dashboard features go here.</div>';
       }
     } catch (error) {
