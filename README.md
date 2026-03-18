@@ -132,12 +132,6 @@ This project implements a **secure web-based patient record management system** 
 
 ---
 
-##  AI Usage Disclosure
-- **AI Usage Disclosure**: This project did not use generative AI for completing the assignment.
-- **Academic Integrity**: All code and documentation are original work.
-
----
-
 ## 📞 Contact
 For questions or feedback, contact:
 - **Module Leader**: Dr. Antesar Shabut (`a.shabut@leedstrinity.ac.uk`)
