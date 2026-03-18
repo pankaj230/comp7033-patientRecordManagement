@@ -1,9 +1,11 @@
 import sqlite3
 import bcrypt
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from pymongo import MongoClient
 import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 # ============================================================================
 # SQLite Database (Authentication)
@@ -93,10 +95,13 @@ class SQLiteDB:
             ''', (email,))
             user = cursor.fetchone()
         if user:
+            password_hash = user[2]
+            if isinstance(password_hash, str):
+                password_hash = password_hash.encode('utf-8')
             return {
                 'id': user[0],
                 'email': user[1],
-                'password_hash': user[2],
+                'password_hash': password_hash,
                 'first_name': user[3],
                 'last_name': user[4],
                 'role': user[5],
@@ -218,7 +223,6 @@ class MongoDB:
                 'blood_type': data.get('blood_type', ''),
                 'emergency_contact': data.get('emergency_contact', ''),
 
-                # Heart Disease/Diabetes Dataset Attributes
                 'age': data.get('age', 0),
                 'sex': data.get('sex', ''),
                 'blood_pressure': data.get('blood_pressure', 0),
@@ -227,7 +231,6 @@ class MongoDB:
                 'resting_ecg': data.get('resting_ecg', 'Normal'),
                 'exercise_induced_angina': data.get('exercise_induced_angina', False),
 
-                # Additional clinical data
                 'max_heart_rate': data.get('max_heart_rate', 0),
                 'oldpeak': data.get('oldpeak', 0.0),
                 'slope': data.get('slope', ''),
@@ -238,10 +241,14 @@ class MongoDB:
                 'treatment_plan': data.get('treatment_plan', ''),
                 'notes': data.get('notes', ''),
 
-                'created_at': datetime.utcnow(),
-                'updated_at': datetime.utcnow()
+                'created_at': datetime.now(timezone.utc),
+                'updated_at': datetime.now(timezone.utc)
             }
-            self.db.patient_records.insert_one(record)
+            self.db.patient_records.update_one(
+                {'patient_id': patient_id},
+                {'$set': record},
+                upsert=True
+            )
             return True
         except Exception as e:
             print(f"Error creating patient record: {str(e)}")
@@ -261,7 +268,7 @@ class MongoDB:
         if not self.connected:
             return False
         try:
-            data['updated_at'] = datetime.utcnow()
+            data['updated_at'] = datetime.now(timezone.utc)
             self.db.patient_records.update_one(
                 {'patient_id': patient_id},
                 {'$set': data}
@@ -282,8 +289,8 @@ class MongoDB:
                 'appointment_date': appointment_date,
                 'reason': reason,
                 'status': 'scheduled',
-                'created_at': datetime.utcnow(),
-                'updated_at': datetime.utcnow()
+                'created_at': datetime.now(timezone.utc),
+                'updated_at': datetime.now(timezone.utc)
             }
             self.db.appointments.insert_one(appointment)
             return True
@@ -312,8 +319,8 @@ class MongoDB:
                 'medication': medication,
                 'dosage': dosage,
                 'duration': duration,
-                'created_at': datetime.utcnow(),
-                'updated_at': datetime.utcnow()
+                'created_at': datetime.now(timezone.utc),
+                'updated_at': datetime.now(timezone.utc)
             }
             self.db.prescriptions.insert_one(prescription)
             return True
@@ -330,6 +337,16 @@ class MongoDB:
         except Exception as e:
             print(f"Error retrieving prescriptions: {str(e)}")
             return []
+
+    def delete_patient_record(self, patient_id: int) -> bool:
+        if not self.connected:
+            return False
+        try:
+            self.db.patient_records.delete_one({'patient_id': patient_id})
+            return True
+        except Exception as e:
+            print(f"Error deleting patient record: {str(e)}")
+            return False
 
     def close(self):
         if self.client:

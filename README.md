@@ -16,7 +16,7 @@ This project implements a **secure web-based patient record management system** 
 ## 🛠️ Features
 ### Core Functionalities
 1. **User Roles & Access Control**
-   - **Patients**: View medical history, book appointments, upload prescriptions.
+   - **Patients**: View medical history, book appointments, view prescriptions from clinicians.
    - **Clinicians**: Diagnose, update records, issue prescriptions.
    - **Administrators**: Manage users, audit logs, oversee system operations.
 
@@ -36,6 +36,7 @@ This project implements a **secure web-based patient record management system** 
 ### Prerequisites
 - Python 3.10+
 - Flask (for web framework)
+- Typescript (for frontend development)
 - SQLite (authentication database)
 - MongoDB (patient records database)
 - Environment variables for secret keys (e.g., `SECRET_KEY`, `JWT_SECRET`)
@@ -64,7 +65,7 @@ This project implements a **secure web-based patient record management system** 
    ```bash
    python app.py
    ```
-   Access the app at `http://localhost:5000`.
+   Access the app at `http://localhost:5001`.
 
 ---
 
@@ -84,8 +85,8 @@ This project implements a **secure web-based patient record management system** 
    - Prevent XSS (Flask-WTF for form validation).
 
 4. **Threat Mitigations**
-   - **Spoofing**: Multi-factor authentication (MFA) for admins.
-   - **Tampering**: Digital signatures for audit logs.
+   - **Spoofing**: JWT tokens with expiration for each user.
+   - **Tampering**: Enabled Input validation and added pattern for email, password.
    - **Repudiation**: Immutable audit trails.
    - **Information Disclosure**: Role-based data masking.
    - **Denial of Service**: Rate limiting for login attempts.
@@ -128,13 +129,6 @@ This project implements a **secure web-based patient record management system** 
 - **Residual Risks**:
   - Potential insider threats (addressed via audit logs).
   - Trade-offs between usability and security (e.g., MFA may reduce user convenience).
-
----
-
-## 📦 Additional Notes
-- **AI Usage Disclosure**: This project did not use generative AI for completing the assignment.
-- **Academic Integrity**: All code and documentation are original work.
-- **Submission**: Push all code to GitHub and submit a zipped copy to Moodle by **20 March 2026**.
 
 ---
 

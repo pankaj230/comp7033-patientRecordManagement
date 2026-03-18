@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for, session, jsonify
+from flask import Blueprint, render_template, request, url_for, session, jsonify, redirect
 from app.auth import register_user, login_user, log_audit, validate_email, sanitize_input
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -56,10 +56,13 @@ def register():
         result = register_user(email, password, first_name, last_name, role)
 
         if result['success']:
-            return jsonify({
-                'success': True,
-                'message': result['message'],
-            }), 200
+            if not request.is_json:
+                return redirect(url_for('auth.login_page'))
+            else:
+                return jsonify({
+                    'success': True,
+                    'message': result['message'],
+                }), 200
         else:
             return jsonify({
                 'success': False,

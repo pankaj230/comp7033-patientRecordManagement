@@ -256,8 +256,8 @@ class Dashboard {
             authManager.redirectToHome();
         }
     }
-    handleBookAppointment() {
-        this.loadClinicians();
+    async handleBookAppointment() {
+        await this.loadClinicians();
         const modal = document.getElementById('appointmentModal');
         if (modal) {
             modal.style.display = 'block';
