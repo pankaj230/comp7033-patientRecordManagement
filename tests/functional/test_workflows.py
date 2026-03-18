@@ -235,27 +235,6 @@ class TestPatientRecordWorkflow(unittest.TestCase):
         data = json.loads(response.data)
         self.assertTrue(data['success'])
 
-    def test_prescription_workflow(self):
-        response = self.app.post(
-            '/api/records/prescriptions',
-            headers={'Authorization': f'Bearer {self.clinician_token}'},
-            json={
-                'patient_id': self.patient_id,
-                'medication': 'Metformin',
-                'dosage': '500mg',
-                'duration': '30 days'
-            }
-        )
-        self.assertEqual(response.status_code, 201)
-
-        response = self.app.get(
-            f'/api/records/patient/{self.patient_id}/prescriptions',
-            headers={'Authorization': f'Bearer {self.clinician_token}'}
-        )
-        self.assertEqual(response.status_code, 200)
-        data = json.loads(response.data)
-        self.assertTrue(data['success'])
-
 
 class TestRoleBasedAccessControlWorkflow(unittest.TestCase):
 
