@@ -119,8 +119,11 @@ def create_user():
 
         if result['success']:
             identity = get_jwt_identity()
+            user_id = int(identity)
+            creator_user = sqlite_db.get_user_by_id(user_id)
+            creator_email = creator_user['email'] if creator_user else 'unknown'
             log_audit('CREATE', 'user', str(result.get('user_id')),
-                     f'Role: {role}, Created by {identity.get("email")}')
+                     f'Role: {role}, Created by {creator_email}')
 
             return jsonify({
                 'success': True,
@@ -153,7 +156,7 @@ def toggle_user_status(user_id):
             }), 404
 
         identity = get_jwt_identity()
-        if identity.get('id') == user_id and not user['is_active']:
+        if identity == user_id and not user['is_active']:
             return jsonify({
                 'success': False,
                 'message': 'Cannot disable your own account'

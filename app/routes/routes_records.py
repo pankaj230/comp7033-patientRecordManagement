@@ -40,10 +40,7 @@ def get_patient_record(patient_id):
         record = mongodb.get_patient_record(patient_id)
 
         if not record:
-            return jsonify({
-                'success': False,
-                'message': 'Medical record not found'
-            }, 404)
+            record = {}
 
         record.pop('_id', None)
 
@@ -84,12 +81,6 @@ def create_patient_record(patient_id):
 
         success = mongodb.create_patient_record(patient_id, record_data)
 
-        if not success:
-            return jsonify({
-                'success': False,
-                'message': 'Failed to create patient record'
-            }), 500
-
         identity = get_jwt_identity()
         user_id = int(identity)
         user = sqlite_db.get_user_by_id(user_id)
@@ -120,13 +111,6 @@ def update_patient_record(patient_id):
                 'message': 'Patient not found'
             }), 404
 
-        record = mongodb.get_patient_record(patient_id)
-        if not record:
-            return jsonify({
-                'success': False,
-                'message': 'Medical record not found. Create record first.'
-            }), 404
-
         data = request.get_json() or {}
 
         update_data = {}
@@ -140,12 +124,6 @@ def update_patient_record(patient_id):
             update_data['emergency_contact'] = sanitize_input(data['emergency_contact'])
 
         success = mongodb.update_patient_record(patient_id, update_data)
-
-        if not success:
-            return jsonify({
-                'success': False,
-                'message': 'Failed to update patient record'
-            }), 500
 
         identity = get_jwt_identity()
         user_id = int(identity)
@@ -341,7 +319,7 @@ def create_prescription():
         return jsonify({
             'success': True,
             'message': 'Prescription created successfully'
-        }), 201
+        }, 201)
 
     except Exception as e:
         return jsonify({

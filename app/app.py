@@ -8,13 +8,12 @@ from datetime import timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
 
 from app.routes.routes_auth import auth_bp
 from app.routes.routes_records import records_bp
 from app.routes.routes_admin import admin_bp
 from app.auth import setup_error_handlers
-from app.models import sqlite_db, mongodb
 
 # ============================================================================
 # Flask Application Initialization
@@ -27,7 +26,7 @@ app = Flask(
 )
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET', 'dev-jwt-secret-change-in-production')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET', 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 app.config['SESSION_COOKIE_SECURE'] = True
 app.config['SESSION_COOKIE_HTTPONLY'] = True

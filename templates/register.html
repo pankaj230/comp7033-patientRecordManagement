@@ -70,8 +70,49 @@
             <p>Already have an account? <a id="loginLink" href="/login">Login here</a></p>
         </div>
     </div>
-    <script type="module">
-import { showAlert } from '/static/js/utils/index.js';
+    <script>
+function showAlert(message, type = 'info', container) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    let targetContainer = container;
+    if (!targetContainer) {
+        targetContainer = document.getElementById('alertContainer');
+    }
+    if (targetContainer) {
+        alertDiv.style.cssText = `
+        padding: 15px 20px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        border: 1px solid;
+      `;
+        switch (type) {
+            case 'success':
+                alertDiv.style.backgroundColor = '#d4edda';
+                alertDiv.style.color = '#155724';
+                alertDiv.style.borderColor = '#c3e6cb';
+                break;
+            case 'error':
+                alertDiv.style.backgroundColor = '#f8d7da';
+                alertDiv.style.color = '#721c24';
+                alertDiv.style.borderColor = '#f5c6cb';
+                break;
+            case 'warning':
+                alertDiv.style.backgroundColor = '#fff3cd';
+                alertDiv.style.color = '#856404';
+                alertDiv.style.borderColor = '#ffeeba';
+                break;
+            default:
+                alertDiv.style.backgroundColor = '#d1ecf1';
+                alertDiv.style.color = '#0c5460';
+                alertDiv.style.borderColor = '#bee5eb';
+        }
+        targetContainer.appendChild(alertDiv);
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 10000);
+    }
+}
 
 const form = document.getElementById('registerForm');
 const spinner = document.getElementById('spinner');
@@ -101,6 +142,9 @@ form.addEventListener('submit', async function(e) {
         if (result.success) {
             showAlert('🎉 ' + (result.message || 'Registration successful! You can now log in.'), 'success', alertContainer);
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 10000);
         } else {
             showAlert('❌ ' + (result.message || 'Registration failed. Please check your details and try again.'), 'error', alertContainer);
         }
