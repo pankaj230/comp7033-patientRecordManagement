@@ -73,6 +73,8 @@ class TestAuditLoggingIntegration(unittest.TestCase):
 class TestPatientRecordDatabaseIntegration(unittest.TestCase):
 
     def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
         self.ctx = app.app_context()
         self.ctx.push()
         self.unique_patient_id = int(time.time() * 1000000)
@@ -133,6 +135,37 @@ class TestPatientRecordDatabaseIntegration(unittest.TestCase):
 
         appointments = mongodb.get_patient_appointments(self.unique_patient_id)
         self.assertIsInstance(appointments, list)
+
+    def test_prescription_workflow(self):
+        clinician_email = f"clinician_{int(time.time() * 1000)}@example.com"
+        register_user(clinician_email, 'ClinicianPass123!', 'Test', 'Clinician', 'clinician')
+        clinician_login = login_user(clinician_email, 'ClinicianPass123!')
+        clinician_token = clinician_login['access_token']
+
+        patient_email = f"patient_{int(time.time() * 1000)}@example.com"
+        register_user(patient_email, 'PatientPass123!', 'Test', 'Patient', 'patient')
+        patient = sqlite_db.get_user_by_email(patient_email)
+        patient_id = patient['id']
+
+        response = self.app.post(
+            '/api/records/prescriptions',
+            headers={'Authorization': f'Bearer {clinician_token}'},
+            json={
+                'patient_id': patient_id,
+                'medication': 'Metformin',
+                'dosage': '500mg',
+                'duration': '30 days'
+            }
+        )
+        self.assertEqual(response.status_code, 201)
+
+        response = self.app.get(
+            f'/api/records/patient/{patient_id}/prescriptions',
+            headers={'Authorization': f'Bearer {clinician_token}'}
+        )
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertTrue(data['success'])
 
     def test_prescription_lifecycle(self):
         if not mongodb.connected:
