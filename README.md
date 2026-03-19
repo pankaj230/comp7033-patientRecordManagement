@@ -132,6 +132,31 @@ This project implements a **secure web-based patient record management system** 
 
 ---
 
+## 🚀 Future Work
+
+### Planned Enhancements
+1. **Digital Payment Integration**
+   - Implement secure payment processing for patients
+   - Support for appointment fees and prescription charges
+   - Integration with payment gateways (Stripe, PayPal)
+   - Payment history and receipts
+
+2. **Enhanced Admin User Management**
+   - Admin interface to add new patients and clinicians
+   - Bulk user import functionality
+   - User deactivation/reactivation capabilities
+   - Advanced user search and filtering
+
+3. **Additional Security Features**
+   - Two-factor authentication (2FA) for all user roles
+   - Automated security compliance reporting
+
+4. **System Improvements**
+   - Real-time notifications system
+   - Advanced analytics dashboard
+
+---
+
 ## 📞 Contact
 For questions or feedback, contact:
 - **Module Leader**: Dr. Antesar Shabut (`a.shabut@leedstrinity.ac.uk`)

@@ -27,6 +27,23 @@
                 <p>Loading prescriptions...</p>
             </div>
         </section>
+        <section class="dashboard-section">
+            <span class="section-icon">💳</span>
+            <h3>Digital Payments</h3>
+            <div id="paymentsSection" class="section-content">
+                <p>Digital payment integration coming soon...</p>
+                <div class="payment-placeholder">
+                    <p>Future features:</p>
+                    <ul>
+                        <li>Pay for appointments</li>
+                        <li>Pay for prescriptions</li>
+                        <li>View payment history</li>
+                        <li>Secure payment processing</li>
+                    </ul>
+                    <button class="btn btn-secondary" disabled>Coming Soon</button>
+                </div>
+            </div>
+        </section>
     </div>
     <div class="dashboard-footer">
         <button id="logoutButton" class="btn btn-secondary">Logout</button>
@@ -236,6 +253,23 @@
     .form-group textarea {
         resize: vertical;
         min-height: 80px;
+    }
+
+    .payment-placeholder {
+        margin-top: 10px;
+        padding: 10px;
+        background: #e8f5e9;
+        border-radius: 8px;
+        border: 1px solid #39803c;
+    }
+
+    .payment-placeholder ul {
+        padding-left: 20px;
+        margin: 10px 0;
+    }
+
+    .payment-placeholder li {
+        margin-bottom: 5px;
     }
 </style>
 
