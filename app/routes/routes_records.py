@@ -319,7 +319,7 @@ def create_prescription():
         return jsonify({
             'success': True,
             'message': 'Prescription created successfully'
-        }, 201)
+        }), 201
 
     except Exception as e:
         return jsonify({
